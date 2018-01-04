@@ -1,0 +1,50 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:upgrade-step="http://namespaces.zope.org/ftw.upgrade"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    i18n_domain="ftw.zipextract">
+
+    <five:registerPackage package="." initialize=".initialize" />
+
+    <genericsetup:registerProfile
+        name="default"
+        title="ftw.zipextract default"
+        directory="profiles/default"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+    <genericsetup:registerProfile
+        name="uninstall"
+        title="ftw.zipextract : uninstall"
+        directory="profiles/uninstall"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        for="Products.CMFPlone.interfaces.IMigratingPloneSiteRoot"
+        />
+
+    <include package=".browser" />
+    <include package="ftw.upgrade" file="meta.zcml" />
+    <upgrade-step:directory
+        profile="ftw.zipextract:default"
+        directory="upgrades"
+        />
+
+    <configure zcml:condition="installed ftw.file">
+        <adapter
+            for="ftw.file.content.file.IFile"
+            factory=".File.FtwFile" />
+
+        <subscriber
+            for="ftw.file.content.file.IFile
+                 Products.Archetypes.interfaces.IObjectInitializedEvent"
+            handler=".events.set_zip_on_creation" />
+
+        <subscriber
+            for="ftw.file.content.file.IFile
+                 Products.Archetypes.interfaces.IObjectEditedEvent"
+            handler=".events.set_zip_on_creation" />
+    </configure>
+
+
+</configure>

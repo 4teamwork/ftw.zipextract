@@ -1,0 +1,22 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="ftw.zipextract"
+      metal:use-macro="context/main_template/macros/master">
+
+    <metal:block fill-slot="header">
+    Extract files
+    </metal:block>
+    <metal:block fill-slot="main">
+        <form tal:attributes="action string:${here/absolute_url}/zipextract">
+            <div tal:content="structure view/tree_html" ></div>
+            <div>
+            <input type="checkbox" id="create_root_folder_checkbox" name="create root folder" checked="checked" /><label for="create_root_folder_checkbox">Create root folder</label></div>
+
+            <input type="hidden" name="form.submitted" value="true" />
+            <input type="submit" name="extract" value="Extract all" i18n:attributes="value button_extract" />
+            <input type="submit" name="extract" value="Extract selected" i18n:attributes="value button_extract" />
+        </form>
+    </metal:block>
+</html>
