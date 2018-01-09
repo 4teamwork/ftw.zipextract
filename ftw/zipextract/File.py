@@ -14,6 +14,18 @@ class _FileBase():
         return self.get_blob() and self.get_content_type() == 'application/zip'
 
 
+class DocumentSchemaFile(_FileBase):
+
+    def get_content_type(self):
+        return self.context.content_type()
+
+    def get_blob(self):
+        return self.context.file
+
+    def set_file(self, blob_file, filename):
+        self.context.update_file(open(blob_file.name),
+                                 "application/text", filename)
+
 class FtwFile(_FileBase):
 
     def get_content_type(self):

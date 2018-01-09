@@ -30,6 +30,23 @@
         directory="upgrades"
         />
 
+    <configure zcml:condition="installed opengever.document">
+        <adapter
+            for="opengever.document.document.IDocumentSchema"
+            factory=".File.DocumentSchemaFile" />
+
+        <subscriber
+            for="opengever.document.document.IDocumentSchema
+                 zope.lifecycleevent.IObjectCreatedEvent"
+            handler=".events.set_zip_on_creation" />
+
+        <subscriber
+            for="opengever.document.document.IDocumentSchema
+                 zope.lifecycleevent.IObjectModifiedEvent"
+            handler=".events.set_zip_on_creation" />
+    </configure>
+
+
     <configure zcml:condition="installed ftw.file">
         <adapter
             for="ftw.file.content.file.IFile"
