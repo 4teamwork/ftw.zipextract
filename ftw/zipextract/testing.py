@@ -28,7 +28,7 @@ class ModuleLayer(PloneSandboxLayer):
 
 
 MODULE_FIXTURE = ModuleLayer()
-MODULE_FUNCTIONAL = FunctionalTesting(
+FTW_ZIPEXTRACT_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(MODULE_FIXTURE,
            set_builder_session_factory(functional_session_factory)),
     name="ftw.zipextract:functional")
