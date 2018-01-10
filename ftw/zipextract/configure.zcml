@@ -30,18 +30,21 @@
         directory="upgrades"
         />
 
-    <configure zcml:condition="installed ftw.file">
+    <configure zcml:condition="installed Products.ATContentTypes">
         <adapter
-            for="ftw.file.content.file.IFile"
-            factory=".File.FtwFile" />
+            for="Products.ATContentTypes.interfaces.file.IATFile"
+            factory=".file.ATFile" />
+
+        <adapter factory=".implementations.ATFileCreator" />
+        <adapter factory=".implementations.ATFolderCreator" />
 
         <subscriber
-            for="ftw.file.content.file.IFile
+            for="Products.ATContentTypes.interfaces.file.IATFile
                  Products.Archetypes.interfaces.IObjectInitializedEvent"
             handler=".events.set_zip_on_creation" />
 
         <subscriber
-            for="ftw.file.content.file.IFile
+            for="Products.ATContentTypes.interfaces.file.IATFile
                  Products.Archetypes.interfaces.IObjectEditedEvent"
             handler=".events.set_zip_on_creation" />
     </configure>
