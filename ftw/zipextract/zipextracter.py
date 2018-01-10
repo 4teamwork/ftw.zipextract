@@ -66,12 +66,17 @@ class ZipExtracter():
     """
 
     def __init__(self, context, max_size=None):
-        file = IFile(context).get_blob()
+        ifile = IFile(context)
+        if not ifile.is_zip():
+            err_msg = "{} is not a zip file, can't extract from it.".format(
+                context.absolute_url_path())
+            raise TypeError(err_msg)
+        file = ifile.get_blob()
         self.context = context
         self.parent_node = context.getParentNode()
         self.zfile = zipfile.ZipFile(file.open())
-        self.file_name = os.path.basename(self.context.virtual_url_path())
-        self.parent_folder = os.path.dirname(self.context.virtual_url_path())
+        self.file_name = os.path.basename(self.context.absolute_url_path())
+        self.parent_folder = os.path.dirname(self.context.absolute_url_path())
         self.file_infos = self.extract_file_infos()
         self._extract_file_tree()
         self.max_size = max_size
@@ -181,6 +186,7 @@ class ZipExtracter():
     def folder_exists(path):
 
         portal = api.portal.get()
+
         try:
             folder = portal.unrestrictedTraverse(path)
         except AttributeError:
@@ -257,8 +263,9 @@ class ZipExtracter():
             written = self.copyfileobj(
                 source, target, file_node.info.file_size)
             if not written == file_node.info.file_size:
-                print("did not finish writing file")
-                return file
+                err_msg = "{} is larger than announced".format(file_node.name)
+                err_msg += " in zip file header. The file will not be extracted"
+                raise IOError(err_msg)
             target.flush()
         file = self.create_object(extract_to, file_node)
         IFile(file).set_file(target, file_node.name)
