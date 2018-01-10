@@ -14,7 +14,7 @@ class ZipExtractView(form.Form):
         self.build_tree_html()
         if self.request.get('form.submitted'):
             self.unzip(self.request)
-            return self.redirect_to_workspace()
+            return self.redirect_to_container()
         return self.template()
 
     @staticmethod
@@ -64,7 +64,7 @@ class ZipExtractView(form.Form):
             node = node.subtree[k]
         return node.file_dict[keys[-1]]
 
-    def redirect_to_workspace(self):
+    def redirect_to_container(self):
         url = self.context.absolute_url()
         return self.request.RESPONSE.redirect(url)
 
