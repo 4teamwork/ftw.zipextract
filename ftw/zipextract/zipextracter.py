@@ -76,6 +76,7 @@ class ZipExtracter():
         self.parent_node = context.getParentNode()
         self.zfile = zipfile.ZipFile(file.open())
         self.file_name = os.path.basename(self.context.absolute_url_path())
+        self.file_name = os.path.splitext(self.file_name)[0]
         self.parent_folder = os.path.dirname(self.context.absolute_url_path())
         self.file_infos = self.extract_file_infos()
         self._extract_file_tree()
