@@ -1,0 +1,38 @@
+# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2018-01-11 15:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Preferred-Encodings: utf-8 latin1\n"
+
+#: ./ftw/zipextract/browser/templates/zipextract.pt:15
+msgid "Create root folder"
+msgstr "Créer dossier racine"
+
+#. Default: "Extract all"
+#: ./ftw/zipextract/browser/templates/zipextract.pt:18
+msgid "button_extract_all"
+msgstr "Extraire tout"
+
+#. Default: "Extract selected"
+#: ./ftw/zipextract/browser/templates/zipextract.pt:19
+msgid "button_extract_selected"
+msgstr "Extraire selection"
+
+#: ./ftw/zipextract/configure.zcml:27
+msgid "ftw.zipextract : uninstall"
+msgstr ""
+
+#: ./ftw/zipextract/configure.zcml:19
+msgid "ftw.zipextract default"
+msgstr ""
+

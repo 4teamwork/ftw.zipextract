@@ -5,25 +5,28 @@ from plone.i18n.normalizer import idnormalizer
 import os
 from z3c.form import form
 
+
 class ZipExtractView(form.Form):
 
     template = ViewPageTemplateFile('templates/zipextract.pt')
 
-    def __call__(self):
+    def render(self):
+        return self.template()
+
+    def update(self):
         self.zipextracter = ZipExtracter(self.context)
-        self.build_tree_html()
         if self.request.get('form.submitted'):
             self.unzip(self.request)
             return self.redirect_to_container()
-        return self.template()
+        self.build_tree_html()
 
     @staticmethod
     def _file_size_repr(file_node):
         size = file_node.info.file_size
         if size > 1024:
-            return str(size/1024)+"KB"
+            return str(size / 1024) + "KB"
         else:
-            return str(size)+"B"
+            return str(size) + "B"
 
     def _recurse_tree_html(self, folder_node):
         for file_node in folder_node.file_dict.values():
@@ -46,15 +49,17 @@ class ZipExtractView(form.Form):
         self.tree_html += '</ul>'
 
     def unzip(self, request):
-        if not request.get('extract'):
+        if not (request.get('extract all') or request.get("extract selected")):
             return
-        if request.get('extract') == "Extract all":
-            file_list=None
-        elif request.get('files'):
+        file_list = None
+        if request.get('extract selected'):
             file_list = request.get('files')
+            if not file_list:
+                return
             file_list = map(self.map_id_to_node, file_list)
         create_root = request.get("create root folder") and True or False
-        self.zipextracter.extract(create_root_folder=create_root, file_list=file_list)
+        self.zipextracter.extract(
+            create_root_folder=create_root, file_list=file_list)
         return
 
     def map_id_to_node(self, node_id):
@@ -67,5 +72,3 @@ class ZipExtractView(form.Form):
     def redirect_to_container(self):
         url = self.context.absolute_url()
         return self.request.RESPONSE.redirect(url)
-
-

@@ -9,14 +9,14 @@
     Extract files
     </metal:block>
     <metal:block fill-slot="main">
-        <form tal:attributes="action string:${here/absolute_url}/zipextract">
+        <form tal:attributes="action string:${here/absolute_url}/zipextract" method="POST">
             <div tal:content="structure view/tree_html" ></div>
             <div>
-            <input type="checkbox" id="create_root_folder_checkbox" name="create root folder" checked="checked" /><label for="create_root_folder_checkbox">Create root folder</label></div>
+            <input type="checkbox" id="create_root_folder_checkbox" name="create root folder" checked="checked" /><label for="create_root_folder_checkbox" i18n:translate="">Create root folder</label></div>
 
             <input type="hidden" name="form.submitted" value="true" />
-            <input type="submit" name="extract" value="Extract all" i18n:attributes="value button_extract" />
-            <input type="submit" name="extract" value="Extract selected" i18n:attributes="value button_extract" />
+            <input type="submit" name="extract all" i18n:attributes="value button_extract_all" />
+            <input type="submit" name="extract selected" i18n:attributes="value button_extract_selected" />
         </form>
     </metal:block>
 </html>
