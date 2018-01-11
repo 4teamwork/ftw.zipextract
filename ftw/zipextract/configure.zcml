@@ -40,5 +40,14 @@
 
     </configure>
 
+    <configure zcml:condition="installed plone.app.contenttypes">
+        <adapter
+            for="plone.app.contenttypes.interfaces.IFile"
+            factory=".file.DXFile" />
+
+        <adapter factory=".implementations.DXFileCreator" />
+        <adapter factory=".implementations.DXFolderCreator" />
+
+    </configure>
 
 </configure>
