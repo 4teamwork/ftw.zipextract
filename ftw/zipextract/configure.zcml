@@ -35,8 +35,8 @@
             for="Products.ATContentTypes.interfaces.file.IATFile"
             factory=".file.ATFile" />
 
-        <adapter factory=".implementations.ATFileCreator" />
-        <adapter factory=".implementations.ATFolderCreator" />
+        <adapter factory=".implementations_at.ATFileCreator" />
+        <adapter factory=".implementations_at.ATFolderCreator" />
 
     </configure>
 
@@ -45,8 +45,8 @@
             for="plone.app.contenttypes.interfaces.IFile"
             factory=".file.DXFile" />
 
-        <adapter factory=".implementations.DXFileCreator" />
-        <adapter factory=".implementations.DXFolderCreator" />
+        <adapter factory=".implementations_dx.DXFileCreator" />
+        <adapter factory=".implementations_dx.DXFolderCreator" />
 
     </configure>
 
