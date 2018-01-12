@@ -158,11 +158,12 @@ class TestZipExtracterDexterity(TestZipExtracterArchetype):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
     expected_titles = ['multizip', 'test3.txt', 'test.txt', 'test2.txt']
-    expected_paths = ['/plone/folder/multi.zip', '/plone/folder/multi-zip/test3',
-                      '/plone/folder/multi-zip/dir1/test', '/plone/folder/multi-zip/dir1/test2']
+    expected_paths = ['/plone/folder/multi.zip', '/plone/folder/multi/test3',
+                      '/plone/folder/multi/dir1/test', '/plone/folder/multi/dir1/test2']
     traverse_error = KeyError
 
     def setUp(self):
         super(TestZipExtracterArchetype, self).setUp()
         self.grant('Contributor')
         self.folder = create(Builder('folder').titled(u'folder'))
+

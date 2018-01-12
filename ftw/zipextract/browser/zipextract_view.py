@@ -18,7 +18,6 @@ class ZipExtractView(form.Form):
         if self.request.get('form.submitted'):
             self.unzip(self.request)
             return self.redirect_to_container()
-        self.build_tree_html()
 
     @staticmethod
     def _file_size_repr(file_node):
@@ -28,25 +27,12 @@ class ZipExtractView(form.Form):
         else:
             return str(size) + "B"
 
-    def _recurse_tree_html(self, folder_node):
-        for file_node in folder_node.file_dict.values():
-            label = file_node.name + ": " + self._file_size_repr(file_node)
-            self.tree_html += '<li id="{id}" class="file"><input type="checkbox" value="{path}"\
-                id="{id}_checkbox" name="files:list" /><label for="{id}_checkbox">{name}</label></li>\n'\
-                .format(path=file_node.path, name=label, id=idnormalizer.normalize(file_node.path))
-        for key in folder_node.subtree:
-            child_folder = folder_node.subtree[key]
-            self.tree_html += '<li id="{id}" class="folder"><input type="checkbox" value="{path}"\
-                id="{id}_checkbox" /><label for="{id}_checkbox">{name}</label><ul>\n'\
-                .format(path=child_folder.path, name=child_folder.name, id=idnormalizer.normalize(child_folder.path))
-#            self.tree_html += '<li id="{}">{}<ul>\n'.format(child_folder.path, key)
-            self._recurse_tree_html(child_folder)
-            self.tree_html += '</ul></li>'
+    def file_repr(self, file_node):
+        return file_node.name + ": " + self._file_size_repr(file_node)
 
-    def build_tree_html(self):
-        self.tree_html = '<ul class="zipextract file_tree" >\n'
-        self._recurse_tree_html(self.zipextracter.file_tree)
-        self.tree_html += '</ul>'
+    @staticmethod
+    def norm_id(node):
+        return idnormalizer.normalize(node.path)
 
     def unzip(self, request):
         if not (request.get('extract all') or request.get("extract selected")):

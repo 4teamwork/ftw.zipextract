@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+    <metal:macro-block metal:define-macro="show_tree">
+        <tal:repeat-file tal:repeat="file_node folder_node/file_dict/values">
+            <li class="file"  tal:define="fid python:view.norm_id(file_node); label python:view.file_repr(file_node); path file_node/path; chid python:fid+'_checkbox' " tal:attributes="id fid">
+                <input  type="checkbox" name="files:list" tal:attributes="value path; id chid"/>
+                <label tal:attributes="for chid ; value label">
+                    <span tal:replace=label></span>
+                </label>
+            </li>
+        </tal:repeat-file>
+        <tal:repeat-folder tal:repeat="child_folder folder_node/subtree/values">
+            <li tal:define="fid python:view.norm_id(child_folder); path child_folder/path; label child_folder/name; chid python:fid+'_checkbox' " tal:attributes="id fid" class="folder">
+                <input  type="checkbox" name="files:list" tal:attributes="value path; id chid"/>
+                <label tal:attributes="for chid; value label">
+                    <span tal:replace="label"></span>
+                </label>
+                <ul>
+                    <tal:recurse-block tal:define="folder_node child_folder">
+                        <tal:block metal:use-macro="context/@@zipextract.macros/show_tree"/>
+                    </tal:recurse-block>
+                </ul>
+            </li>
+        </tal:repeat-folder>
+    </metal:macro-block>
+
+</html>
