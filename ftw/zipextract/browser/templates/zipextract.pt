@@ -6,7 +6,9 @@
       metal:use-macro="context/main_template/macros/master">
 
     <metal:block fill-slot="header">
-    Extract files
+        <h1 class="documentFirstHeading">
+            <span i18n:translate="Extract files from "/> <span tal:replace="python:view.filename()"/>
+        </h1>
     </metal:block>
     <metal:block fill-slot="main">
         <form tal:attributes="action string:${here/absolute_url}/zipextract" method="POST">

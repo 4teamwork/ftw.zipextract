@@ -19,6 +19,9 @@ class ZipExtractView(form.Form):
             self.unzip(self.request)
             return self.redirect_to_container()
 
+    def filename(self):
+        return os.path.basename(self.context.absolute_url_path())
+
     @staticmethod
     def _file_size_repr(file_node):
         size = file_node.info.file_size
