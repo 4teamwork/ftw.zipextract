@@ -49,6 +49,7 @@ class ModuleLayerDXTypes(PloneSandboxLayer):
         applyProfile(portal, 'plone.app.contenttypes:default')
         register_dx_content_builders(force=True)
 
+
 MODULE_FIXTURE = ModuleLayerATTypes()
 FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes = FunctionalTesting(
     bases=(MODULE_FIXTURE,

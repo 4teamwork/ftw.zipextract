@@ -30,7 +30,7 @@ Implementation
 ==============
 
 * The ``ftw.zipextract.zipextracter.ZipExtracter`` class handles the extraction from the zip file.
-* The ``ftw.zipextract.browser.zipextract_view.ZipExtractView``is used for the rendering of the extraction view. It is registered as ``zipextract`` and will be applied on its context.
+* The ``ftw.zipextract.browser.zipextract_view.ZipExtractView`` is used for the rendering of the extraction view. It is registered as ``zipextract`` and will be applied on its context.
 
 Handling and creation of files and folders depends on the context and the content types. To handle this, 3 interfaces are used:
 * ``ftw.zipextract.interfaces.IFile`` defines a few methods for file handling and notably an `is_zip` method used to determine whether the extraction can be used on a given file or not.

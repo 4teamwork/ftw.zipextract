@@ -1,23 +1,22 @@
 from Products.Five.browser import BrowserView
 from ftw.zipextract.zipextracter import ZipExtracter
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.i18n.normalizer import idnormalizer
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 import os
-from z3c.form import form
 
 
-class ZipExtractView(form.Form):
+class ZipExtractView(BrowserView):
 
     template = ViewPageTemplateFile('templates/zipextract.pt')
 
-    def render(self):
-        return self.template()
-
-    def update(self):
+    def __call__(self):
         self.zipextracter = ZipExtracter(self.context)
+        for file_node in self.zipextracter.file_tree.get_files():
+            file_node.repr = self.file_repr(file_node)
         if self.request.get('form.submitted'):
             self.unzip(self.request)
             return self.redirect_to_container()
+        return self.template()
 
     def filename(self):
         return os.path.basename(self.context.absolute_url_path())
@@ -32,10 +31,6 @@ class ZipExtractView(form.Form):
 
     def file_repr(self, file_node):
         return file_node.name + ": " + self._file_size_repr(file_node)
-
-    @staticmethod
-    def norm_id(node):
-        return idnormalizer.normalize(node.path)
 
     def unzip(self, request):
         if not (request.get('extract all') or request.get("extract selected")):

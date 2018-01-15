@@ -13,13 +13,16 @@
     <metal:block fill-slot="main">
         <form tal:attributes="action string:${here/absolute_url}/zipextract" method="POST">
 
-            <ul class="zipextract file_tree" tal:define="folder_node view/zipextracter/file_tree" >
-                <metal:block tal:define="folder_node view/zipextracter/file_tree" metal:use-macro='context/@@zipextract.macros/show_tree'>
+            <ul class="zipextract file_tree"
+                tal:define="folder_node view/zipextracter/file_tree" >
+                <metal:block tal:define="folder_node view/zipextracter/file_tree"
+                             metal:use-macro="context/@@zipextract.macros/show_tree">
                 </metal:block>
             </ul>
 
             <div>
-                <input type="checkbox" id="create_root_folder_checkbox" name="create root folder" checked="checked" />
+                <input type="checkbox" id="create_root_folder_checkbox"
+                       name="create root folder" checked="checked" />
                 <label for="create_root_folder_checkbox" i18n:translate="">
                     Create root folder
                 </label>
@@ -27,7 +30,8 @@
 
             <input type="hidden" name="form.submitted" value="true" />
             <input type="submit" name="extract all" i18n:attributes="value button_extract_all" />
-            <input type="submit" name="extract selected" i18n:attributes="value button_extract_selected" />
+            <input type="submit" name="extract selected"
+                   i18n:attributes="value button_extract_selected" />
         </form>
     </metal:block>
 </html>

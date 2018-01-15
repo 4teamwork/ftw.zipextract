@@ -9,6 +9,7 @@ class FileBase():
     Abstract base class for implementing the IFIle interface.
     Should not be used on its own.
     """
+
     implements(IFile)
 
     def __init__(self, context):
@@ -28,7 +29,7 @@ class FileBase():
 
 
 class ATFile(FileBase):
-    """ Adapter for archetype files
+    """Adapter for archetype files
     """
 
     def get_content_type(self):
@@ -38,7 +39,7 @@ class ATFile(FileBase):
         return self.context.getFile().getBlob()
 
     def get_data(self):
-        """ Only used for tests
+        """Only used for tests
         """
         return self.context.data
 
@@ -47,9 +48,8 @@ class ATFile(FileBase):
         self.context.setFilename(filename)
 
 
-
 class DXFile(FileBase):
-    """ Adapter for archetype files
+    """Adapter for archetype files
     """
 
     def get_content_type(self):
@@ -60,14 +60,15 @@ class DXFile(FileBase):
         return self.context.file
 
     def get_data(self):
-        """ Only used for tests
+        """Only used for tests
         """
+
         return self.get_blob().data
 
     def set_file(self, blob_file, filename):
         mimetype = mimetypes.guess_type(filename)[0]
         self.context.file = NamedBlobFile(
             data=open(blob_file.name),
-            filename=filename,
+            filename=unicode(filename),
             contentType=mimetype)
         self.context.reindexObject()

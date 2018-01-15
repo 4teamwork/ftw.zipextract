@@ -9,12 +9,11 @@ from ftw.zipextract.zipextracter import ZipExtracter
 from operator import itemgetter
 from operator import methodcaller
 import os
-from unittest2 import TestCase
 
 
 class ZipExtracterTestBase(FunctionalTestCase):
 
-    def AddMultiZipFile(self):
+    def add_multi_zip_file(self):
         """ This zip file contains 3 files and a directory
         """
         self.file = create(
@@ -23,7 +22,7 @@ class ZipExtracterTestBase(FunctionalTestCase):
             .attach_file_containing(self.asset('multi.zip'), u'multi.zip')
             .within(self.folder))
 
-    def AddOutsideZipFile(self):
+    def add_outside_zip_file(self):
         """ This zip contains a file "../test.txt"
         """
         self.file = create(
@@ -32,7 +31,7 @@ class ZipExtracterTestBase(FunctionalTestCase):
             .attach_file_containing(self.asset('outside.zip'), u'outside.zip')
             .within(self.folder))
 
-    def AddFalseSizeZipFile(self):
+    def add_false_size_zip_file(self):
         """ This zip contains a file "test.txt" with a file size
         larger than announced in the header
         """
@@ -42,7 +41,7 @@ class ZipExtracterTestBase(FunctionalTestCase):
             .attach_file_containing(self.asset('false_size.zip'), u'false_size.zip')
             .within(self.folder))
 
-    def AddTextFile(self):
+    def add_text_file(self):
         """ This zip file contains 3 files and a directory
         """
         self.file = create(
@@ -73,7 +72,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.folder = create(Builder('folder').titled(u'folder'))
 
     def test_zipextracter_file_tree(self):
-        self.AddMultiZipFile()
+        self.add_multi_zip_file()
         extracter = ZipExtracter(self.file)
         tree = extracter.file_tree
         # Directory tree
@@ -104,7 +103,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
             ZipExtracter.check_path_inside_destination("/test", ""))
 
     def test_zipextracter_extract_file_works(self):
-        self.AddMultiZipFile()
+        self.add_multi_zip_file()
         extracter = ZipExtracter(self.file)
         to_extract = extracter.file_tree.subtree["dir1"].file_dict["test2"]
         with self.assertRaises(self.traverse_error):
@@ -114,7 +113,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.assertEqual(IFile(file).get_data(), 'Another test text file')
 
     def test_zip_extract_all_works(self):
-        self.AddMultiZipFile()
+        self.add_multi_zip_file()
         extracter = ZipExtracter(self.file)
         extracter.extract()
         files = self.portal.portal_catalog(portal_type="File")
@@ -125,14 +124,14 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.assertEquals(self.expected_paths, paths)
 
     def test_handle_extract_outside_destination(self):
-        self.AddOutsideZipFile()
+        self.add_outside_zip_file()
         extracter = ZipExtracter(self.file)
         extracter.extract(create_root_folder=False)
         file = self.portal.portal_catalog(portal_type="File", Title="test")[0]
         self.assertEquals("/plone/folder/test", file.getPath())
 
     def test_handle_false_file_size(self):
-        self.AddFalseSizeZipFile()
+        self.add_false_size_zip_file()
         extracter = ZipExtracter(self.file)
         nfiles = len(self.portal.portal_catalog(portal_type="File"))
         with self.assertRaises(IOError):
@@ -142,7 +141,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
 
     @browsing
     def test_zip_extraction_view_works(self, browser):
-        self.AddMultiZipFile()
+        self.add_multi_zip_file()
         browser.visit(self.file, view="zipextract")
         file_tree = browser.css(".zipextract.file_tree li")
         id_list = map(lambda el: el.node.get("id"), file_tree)
@@ -153,7 +152,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
     @browsing
     def test_zip_extraction_view_only_allowed_for_zip_files(self, browser):
         browser.exception_bubbling = True
-        self.AddTextFile()
+        self.add_text_file()
         with self.assertRaises(TypeError):
             browser.visit(self.file, view="zipextract")
 

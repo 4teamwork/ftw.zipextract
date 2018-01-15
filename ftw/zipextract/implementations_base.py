@@ -3,6 +3,7 @@ class ObjectCreatorBase():
     """
     Abstract base class for implementing the IFolderCreator interface
     """
+
     def __init__(self, context):
         self.context = context
 

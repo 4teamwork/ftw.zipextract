@@ -3,11 +3,11 @@ import os
 from plone import api
 from Products.CMFCore.interfaces import IFolderish
 from plone.i18n.normalizer.interfaces import IIDNormalizer
+import string
 from tempfile import NamedTemporaryFile
 from ftw.zipextract.interfaces import IFolderCreator
 from ftw.zipextract.interfaces import IFileCreator
 from ftw.zipextract.interfaces import IFile
-from ftw.zipextract import _
 from ftw.zipextract import logger
 import zipfile
 from ZODB.POSException import ConflictError
@@ -18,13 +18,27 @@ except ImportError:
     from zope.container.interfaces import INameChooser
 
 
-class _FileNode():
+def normalize_id(name):
+    normalizer = component.getUtility(IIDNormalizer)
+    normalized = normalizer.normalize(name)
+    normalized = normalized.replace('_', '-').replace(' ', '-').lower()
+    return normalized
+
+
+def generate_uid(name, context):
+    normalized_id = normalize_id(name)
+    chooser = INameChooser(context)
+    return chooser.chooseName(normalized_id, context)
+
+
+class FileNode(object):
 
     def __init__(self, parent_folder, filename, fileid, info):
-        self.name = _(filename)
+        self.name = filename
         self.info = info
         self.parent_folder = parent_folder
         self.id = fileid
+        self.path_id = normalize_id(self.path)
         self.is_folder = False
 
     @property
@@ -32,7 +46,7 @@ class _FileNode():
         return os.path.join(self.parent_folder.path, self.id)
 
 
-class _FolderNode():
+class FolderNode(object):
 
     def __init__(self, parent_folder, folder_name):
         self.name = folder_name
@@ -40,6 +54,7 @@ class _FolderNode():
         self.file_dict = {}
         self.parent_folder = parent_folder
         self.id = self.name
+        self.path_id = normalize_id(self.path)
         self.is_folder = True
 
     @property
@@ -56,7 +71,7 @@ class _FolderNode():
         return file_list
 
 
-class ZipExtracter():
+class ZipExtracter(object):
     """
     This should be initialized with a file object.
     It implements an "extract" method, which creates
@@ -71,10 +86,10 @@ class ZipExtracter():
             err_msg = "{} is not a zip file, can't extract from it.".format(
                 context.absolute_url_path())
             raise TypeError(err_msg)
-        file = ifile.get_blob()
+        file_blob = ifile.get_blob()
         self.context = context
         self.parent_node = context.getParentNode()
-        self.zfile = zipfile.ZipFile(file.open())
+        self.zfile = zipfile.ZipFile(file_blob.open())
         self.file_name = os.path.basename(self.context.absolute_url_path())
         self.file_name = os.path.splitext(self.file_name)[0]
         self.parent_folder = os.path.dirname(self.context.absolute_url_path())
@@ -82,28 +97,14 @@ class ZipExtracter():
         self._extract_file_tree()
         self.max_size = max_size
         self.file_creator = IFileCreator(self.context)
-        #self.folder_creator = IFolderCreator(self.parent_node)
-
-    def _isdir(self, type):
-        if type == "Folder":
-            return True
-        return False
 
     def extract_file_infos(self):
         return self.zfile.infolist()
 
     @staticmethod
-    def generate_id(name, context):
-        normalizer = component.getUtility(IIDNormalizer)
-        chooser = INameChooser(context)
-        normalized = normalizer.normalize(name)
-        normalized = normalized.replace('_', '-').replace(' ', '-').lower()
-        return chooser.chooseName(normalized, context)
-
-    @staticmethod
     def generate_dict_key(name, d):
         name = os.path.splitext(name)[0]
-        if not name in d:
+        if name not in d:
             return name
         i = 1
         while True:
@@ -114,34 +115,26 @@ class ZipExtracter():
             return new_name
 
     def _extract_file_tree(self):
-        self.file_tree = _FolderNode(None, "")
+        self.file_tree = FolderNode(None, "")
         # We first make all the directories
         for info in self.file_infos:
             is_folder = self.is_folder(info.filename)
             target_path = self.get_target_path(info)
             keys = target_path.split(os.path.sep)
-            if not is_folder:
-                keys = keys[:-1]
-            curr_node = self.file_tree
-            for k in keys:
-                if not k in curr_node.subtree:
-                    curr_node.subtree[k] = _FolderNode(curr_node, k)
-                curr_node = curr_node.subtree[k]
-        # Now we add the files
-        for info in self.file_infos:
-            is_folder = self.is_folder(info.filename)
-            target_path = self.get_target_path(info)
             if is_folder:
-                continue
-            keys = target_path.split(os.path.sep)
+                folder_keys = keys
+            else:
+                folder_keys = keys[:-1]
             curr_node = self.file_tree
-            for k in keys[:-1]:
+            for k in folder_keys:
+                if k not in curr_node.subtree:
+                    curr_node.subtree[k] = FolderNode(curr_node, k)
                 curr_node = curr_node.subtree[k]
-
-            filename = keys[-1]
-            file_id = self.generate_dict_key(filename, curr_node.file_dict)
-            curr_node.file_dict[file_id] = _FileNode(
-                curr_node, filename, file_id, info)
+            if not is_folder:
+                filename = keys[-1]
+                file_id = self.generate_dict_key(filename, curr_node.file_dict)
+                curr_node.file_dict[file_id] = FileNode(
+                    curr_node, filename, file_id, info)
 
     def is_folder(self, path):
         if path.endswith("/"):
@@ -150,7 +143,7 @@ class ZipExtracter():
             return False
 
     def get_target_path(self, member):
-        """ Build destination pathname, making it platform
+        """Build destination pathname, making it platform
         independent, and ensuring the path cannot point outside
         the current directory
         """
@@ -179,7 +172,8 @@ class ZipExtracter():
         targetpath = os.path.normpath(targetpath)
         realpath = os.path.abspath(os.path.realpath(targetpath))
         if not realpath.startswith(os.path.abspath(destinationpath)):
-            logger.info("targetpath outside of destination directory. Skipping")
+            logger.info(
+                "targetpath outside of destination directory. Skipping")
             return False
         return True
 
@@ -205,14 +199,12 @@ class ZipExtracter():
         folder = self.folder_exists(base_path)
         if not folder:
             return None
-        newid = self.generate_id(node.id, folder)
+        newid = generate_uid(node.id, folder)
         node.id = newid
         error = ''
         try:
-            #folder.invokeFactory(type_name=node.portal_type, id=newid, title=node.name)
             if node.is_folder:
                 IFolderCreator(folder).create(folder, newid, node.name)
-                #self.folder_creator.create(folder, newid, node.name)
             else:
                 self.file_creator.create(folder, newid, node.name)
 
@@ -253,7 +245,7 @@ class ZipExtracter():
             self.create_object(extract_to, folder_node)
 
     def extract_file(self, file_node, extract_to=None):
-        if extract_to == None:
+        if extract_to is None:
             extract_to = self.parent_folder
         target_path = file_node.path
         if not self.check_path_inside_destination(target_path, extract_to):
@@ -268,12 +260,12 @@ class ZipExtracter():
                 err_msg += " in zip file header. The file will not be extracted"
                 raise IOError(err_msg)
             target.flush()
-        file = self.create_object(extract_to, file_node)
-        IFile(file).set_file(target, file_node.name)
-        return file
+        file_obj = self.create_object(extract_to, file_node)
+        IFile(file_obj).set_file(target, file_node.name)
+        return file_obj
 
     def extract(self, extract_to=None, create_root_folder=True, file_list=None):
-        if extract_to == None:
+        if extract_to is None:
             extract_to = self.parent_folder
         if not self.folder_exists(extract_to):
             logger.info("Folder does not exist, aborting zip extraction")
@@ -281,8 +273,8 @@ class ZipExtracter():
         if create_root_folder:
             self.file_tree.id = self.file_name
             self.file_tree.name = self.file_name
-            folder = self.create_object(extract_to, self.file_tree)
-        if file_list == None:
+            self.create_object(extract_to, self.file_tree)
+        if file_list is None:
             file_list = self.file_tree.get_files()
         tot_size = sum([file.info.file_size for file in file_list])
         if self.max_size and tot_size > self.max_size:
