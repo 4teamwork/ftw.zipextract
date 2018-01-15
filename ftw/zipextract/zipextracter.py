@@ -179,7 +179,7 @@ class ZipExtracter():
         targetpath = os.path.normpath(targetpath)
         realpath = os.path.abspath(os.path.realpath(targetpath))
         if not realpath.startswith(os.path.abspath(destinationpath)):
-            print("targetpath outside of destination directory. Skipping")
+            logger.info("targetpath outside of destination directory. Skipping")
             return False
         return True
 
@@ -276,7 +276,7 @@ class ZipExtracter():
         if extract_to == None:
             extract_to = self.parent_folder
         if not self.folder_exists(extract_to):
-            print("folder does not exist")
+            logger.info("Folder does not exist, aborting zip extraction")
             return
         if create_root_folder:
             self.file_tree.id = self.file_name
