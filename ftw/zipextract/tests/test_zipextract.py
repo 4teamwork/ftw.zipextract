@@ -59,11 +59,12 @@ class ZipExtracterTestBase(FunctionalTestCase):
 class TestZipExtracterArchetype(ZipExtracterTestBase):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
-    expected_titles = ['multizip', 'test.txt',
-                       'test3.txt', 'test2.txt', 'test4.txt']
-    expected_paths = ['/plone/folder/multizip', '/plone/folder/multizip-1/test',
-                      '/plone/folder/multizip-1/dir1/test3', '/plone/folder/multizip-1/dir1/test2',
-                      '/plone/folder/multizip-1/dir1/dir2/test4']
+    expected_titles = ['multizip', 'test.txt', 'test2.txt', 'test4.txt', 'test3.txt']
+    expected_paths = ['/plone/folder/multizip', '/plone/folder/multizip-1/test-txt',
+                      '/plone/folder/multizip-1/dir1/test2-txt', '/plone/folder/multizip-1/dir1/test3-txt',
+                      '/plone/folder/multizip-1/dir1/dir2/test4-txt']
+    expected_path_outside = "/plone/folder/test-txt"
+    expected_path_single = '/plone/folder/dir1/test2-txt'
     traverse_error = AttributeError
 
     def setUp(self):
@@ -106,10 +107,11 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.add_multi_zip_file()
         extracter = ZipExtracter(self.file)
         to_extract = extracter.file_tree.subtree["dir1"].file_dict["test2"]
+        path = self.expected_path_single
         with self.assertRaises(self.traverse_error):
-            self.portal.unrestrictedTraverse("/plone/folder/dir1/test2")
+            self.portal.unrestrictedTraverse(path)
         extracter.extract_file(to_extract)
-        file = self.portal.unrestrictedTraverse("/plone/folder/dir1/test2")
+        file = self.portal.unrestrictedTraverse(path)
         self.assertEqual(IFile(file).get_data(), 'Another test text file')
 
     def test_zip_extract_all_works(self):
@@ -119,16 +121,16 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         files = self.portal.portal_catalog(portal_type="File")
         self.assertEquals(5, len(files))
         titles = map(itemgetter("Title"), files)
-        self.assertEquals(self.expected_titles, titles)
+        self.assertItemsEqual(self.expected_titles, titles)
         paths = map(methodcaller("getPath"), files)
-        self.assertEquals(self.expected_paths, paths)
+        self.assertItemsEqual(self.expected_paths, paths)
 
     def test_handle_extract_outside_destination(self):
         self.add_outside_zip_file()
         extracter = ZipExtracter(self.file)
         extracter.extract(create_root_folder=False)
         file = self.portal.portal_catalog(portal_type="File", Title="test")[0]
-        self.assertEquals("/plone/folder/test", file.getPath())
+        self.assertEquals(self.expected_path_outside, file.getPath())
 
     def test_handle_false_file_size(self):
         self.add_false_size_zip_file()
@@ -160,9 +162,11 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
 class TestZipExtracterDexterity(TestZipExtracterArchetype):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
-    expected_paths = ['/plone/folder/multi.zip', '/plone/folder/multi/test',
-                      '/plone/folder/multi/dir1/test3', '/plone/folder/multi/dir1/test2',
-                      '/plone/folder/multi/dir1/dir2/test4']
+    expected_paths = ['/plone/folder/multi.zip', '/plone/folder/multi/test.txt',
+                      '/plone/folder/multi/dir1/test2.txt', '/plone/folder/multi/dir1/test3.txt',
+                      '/plone/folder/multi/dir1/dir2/test4.txt']
+    expected_path_single = '/plone/folder/dir1/test2.txt'
+    expected_path_outside = "/plone/folder/test.txt"
     traverse_error = KeyError
 
     def setUp(self):

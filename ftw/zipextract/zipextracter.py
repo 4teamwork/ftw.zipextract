@@ -17,6 +17,9 @@ try:
 except ImportError:
     from zope.container.interfaces import INameChooser
 
+from Products.CMFCore.utils import getToolByName
+from zope.component import queryMultiAdapter
+from zope.component import getMultiAdapter
 
 def normalize_id(name):
     normalizer = component.getUtility(IIDNormalizer)
@@ -70,6 +73,13 @@ class FolderNode(object):
             file_list.extend(self.subtree[folder_node].get_files())
         return file_list
 
+def get_creator(interface, container, portal_type):
+    fti = getToolByName(container, 'portal_types').get(portal_type)
+    creator = queryMultiAdapter((container, container.REQUEST, fti), interface, name=portal_type)
+    if creator is not None:
+        return creator
+    else:
+        return getMultiAdapter((container, container.REQUEST, fti), interface)
 
 class ZipExtracter(object):
     """
@@ -96,7 +106,6 @@ class ZipExtracter(object):
         self.file_infos = self.extract_file_infos()
         self._extract_file_tree()
         self.max_size = max_size
-        self.file_creator = IFileCreator(self.context)
 
     def extract_file_infos(self):
         return self.zfile.infolist()
@@ -190,8 +199,7 @@ class ZipExtracter(object):
             return False
         return IFolderish.providedBy(folder) and folder
 
-    def create_object(self, extract_to, node):
-
+    def create_object(self, extract_to, node, blob_file=None):
         if node.parent_folder:
             base_path = os.path.join(extract_to, node.parent_folder.path)
         else:
@@ -199,31 +207,16 @@ class ZipExtracter(object):
         folder = self.folder_exists(base_path)
         if not folder:
             return None
-        newid = generate_uid(node.id, folder)
-        node.id = newid
-        error = ''
-        try:
-            if node.is_folder:
-                IFolderCreator(folder).create(folder, newid, node.name)
-            else:
-                self.file_creator.create(folder, newid, node.name)
 
-        except Unauthorized:
-            error = u'serverErrorNoPermission'
-        except ConflictError:
-            # rare with xhr upload / happens sometimes with flashupload
-            error = u'serverErrorZODBConflict'
-        except Exception, e:
-            error = u'serverError'
-            logger.exception(e)
-        if error:
-            error = u'serverError'
-            logger.info("An error happens with setId from filename, "
-                        "the file has been created with a bad id, "
-                        "can't find %s", newid)
+        if node.is_folder:
+            creator = get_creator(IFolderCreator, folder, folder.portal_type)
+            obj = creator.create(node.name)
         else:
-            obj = getattr(folder, newid)
-            return obj
+            creator = get_creator(IFileCreator, folder, 'File')
+            obj = creator.create(node.name, blob_file)
+        node.id=obj.id
+        return obj
+
 
     @staticmethod
     def copyfileobj(fsrc, fdst, max_size, buffer_length=16 * 1024):
@@ -260,8 +253,7 @@ class ZipExtracter(object):
                 err_msg += " in zip file header. The file will not be extracted"
                 raise IOError(err_msg)
             target.flush()
-        file_obj = self.create_object(extract_to, file_node)
-        IFile(file_obj).set_file(target, file_node.name)
+        file_obj = self.create_object(extract_to, file_node, target)
         return file_obj
 
     def extract(self, extract_to=None, create_root_folder=True, file_list=None):
