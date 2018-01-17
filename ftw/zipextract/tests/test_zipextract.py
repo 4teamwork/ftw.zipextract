@@ -41,6 +41,16 @@ class ZipExtracterTestBase(FunctionalTestCase):
             .attach_file_containing(self.asset('false_size.zip'), u'false_size.zip')
             .within(self.folder))
 
+    def add_name_conflict_zip_file(self):
+        """ This zip contains a file "test.txt" with a file size
+        larger than announced in the header
+        """
+        self.file = create(
+            Builder('file')
+            .titled(u'name_conflict')
+            .attach_file_containing(self.asset('name_conflict.zip'), u'name_conflict.zip')
+            .within(self.folder))
+
     def add_text_file(self):
         """ This zip file contains 3 files and a directory
         """
@@ -65,6 +75,13 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
                       '/plone/folder/multizip-1/dir1/dir2/test4-txt']
     expected_path_outside = "/plone/folder/test-txt"
     expected_path_single = '/plone/folder/dir1/test2-txt'
+    expected_titles_conflicts = ['name_conflict', 'test.txt', 'test.txt',
+                                 'test.txt', 'test.txt']
+    expected_paths_conflicts = ['/plone/folder/name_conflict',
+                               '/plone/folder/name_conflict-1/test-txt',
+                               '/plone/folder/name_conflict-1/test/test-txt',
+                               '/plone/folder/name_conflict-1/test/test-txt-1',
+                               '/plone/folder/name_conflict-1/test/test/test-txt']
     traverse_error = AttributeError
 
     def setUp(self):
@@ -141,6 +158,16 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.assertEquals(
             nfiles, len(self.portal.portal_catalog(portal_type="File")))
 
+    def test_handle_name_conflicts(self):
+        self.add_name_conflict_zip_file()
+        extracter = ZipExtracter(self.file)
+        extracter.extract()
+        files = self.portal.portal_catalog(portal_type="File")
+        titles = map(itemgetter("Title"), files)
+        self.assertItemsEqual(self.expected_titles_conflicts, titles)
+        paths = map(methodcaller("getPath"), files)
+        self.assertItemsEqual(self.expected_paths_conflicts, paths)
+
     @browsing
     def test_zip_extraction_view_works(self, browser):
         self.add_multi_zip_file()
@@ -167,6 +194,11 @@ class TestZipExtracterDexterity(TestZipExtracterArchetype):
                       '/plone/folder/multi/dir1/dir2/test4.txt']
     expected_path_single = '/plone/folder/dir1/test2.txt'
     expected_path_outside = "/plone/folder/test.txt"
+    expected_paths_conflicts = ['/plone/folder/name_conflict.zip',
+                               '/plone/folder/name_conflict/test.txt',
+                               '/plone/folder/name_conflict/test/test.txt',
+                               '/plone/folder/name_conflict/test/test-1.txt',
+                               '/plone/folder/name_conflict/test/test/test.txt']
     traverse_error = KeyError
 
     def setUp(self):

@@ -197,7 +197,9 @@ class ZipExtracter(object):
             return False
         except KeyError:
             return False
-        return IFolderish.providedBy(folder) and folder
+        return (IFolderish.providedBy(folder) and
+                folder.absolute_url_path()==os.path.normpath(path) and
+                folder)
 
     def create_object(self, extract_to, node, blob_file=None):
         if node.parent_folder:
@@ -232,6 +234,7 @@ class ZipExtracter(object):
 
     def create_parent_folders(self, extract_to, folder_node):
         parent_folder = folder_node.parent_folder
+
         if parent_folder and not self.folder_exists(os.path.join(extract_to, parent_folder.path)):
             self.create_parent_folders(extract_to, parent_folder)
         if not self.folder_exists(os.path.join(extract_to, folder_node.path)):
