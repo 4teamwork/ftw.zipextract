@@ -32,6 +32,7 @@ class IFolderCreator(Interface):
         """creates a folder named 'name' in the container
         """
 
+
 class IFileCreator(Interface):
     """The folder creator is used to create a file in
     a given container

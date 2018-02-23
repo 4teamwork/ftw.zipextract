@@ -1,6 +1,5 @@
-from Products.Five.browser import BrowserView
 from ftw.zipextract.zipextracter import ZipExtracter
-from plone.i18n.normalizer import idnormalizer
+from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 import os
 

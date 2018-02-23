@@ -53,4 +53,3 @@ class DXFile(FileBase):
         """Only used for tests
         """
         return self.get_blob().data
-

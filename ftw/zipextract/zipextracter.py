@@ -1,24 +1,25 @@
-import os
-import mimetypes
-from plone import api
-from Products.CMFCore.interfaces import IFolderish
-from plone.i18n.normalizer.interfaces import IIDNormalizer
-import string
-from tempfile import NamedTemporaryFile
-from ftw.zipextract.interfaces import IFolderCreator
-from ftw.zipextract.interfaces import IFileCreator
-from ftw.zipextract.interfaces import IFile
 from ftw.zipextract import logger
-import zipfile
+from ftw.zipextract.interfaces import IFactoryTypeDecider
+from ftw.zipextract.interfaces import IFile
+from ftw.zipextract.interfaces import IFileCreator
+from ftw.zipextract.interfaces import IFolderCreator
+from plone import api
+from plone.i18n.normalizer.interfaces import IIDNormalizer
+from Products.CMFCore.interfaces import IFolderish
+from tempfile import NamedTemporaryFile
 from zope import component
+from zope.component import getMultiAdapter
+from zope.component import queryMultiAdapter
+import mimetypes
+import os
+import string
+import zipfile
+
+
 try:
     from zope.app.container.interfaces import INameChooser
 except ImportError:
     from zope.container.interfaces import INameChooser
-
-from zope.component import queryMultiAdapter
-from zope.component import getMultiAdapter
-from ftw.zipextract.interfaces import IFactoryTypeDecider
 
 
 def normalize_id(name):
@@ -75,7 +76,8 @@ class FolderNode(object):
 
 
 def get_creator(interface, container, fti):
-    creator = queryMultiAdapter((container, container.REQUEST, fti), interface, name=fti.id)
+    creator = queryMultiAdapter((container, container.REQUEST, fti),
+                                interface, name=fti.id)
     if creator is not None:
         return creator
     else:
@@ -95,7 +97,7 @@ class ZipExtracter(object):
         ifile = IFile(context)
         if not ifile.is_zip():
             err_msg = "{} is not a zip file, can't extract from it.".format(
-                context.absolute_url_path())
+                        context.absolute_url_path())
             raise TypeError(err_msg)
         file_blob = ifile.get_blob()
         self.context = context
@@ -161,8 +163,9 @@ class ZipExtracter(object):
         if os.path.altsep:
             arcname = arcname.replace(os.path.altsep, os.path.sep)
         arcname = os.path.splitdrive(arcname)[1]
-        arcname = os.path.sep.join(x for x in arcname.split(os.path.sep)
-                                   if x not in ('', os.path.curdir, os.path.pardir))
+        arcname = os.path.sep.join(
+                    x for x in arcname.split(os.path.sep)
+                    if x not in ('', os.path.curdir, os.path.pardir))
         if os.path.sep == '\\':
             # filter illegal characters on Windows
             illegal = ':<>|"?*'
@@ -199,7 +202,7 @@ class ZipExtracter(object):
         except KeyError:
             return False
         return (IFolderish.providedBy(folder) and
-                folder.absolute_url_path()==os.path.normpath(path) and
+                folder.absolute_url_path() == os.path.normpath(path) and
                 folder)
 
     def create_object(self, extract_to, node, blob_file=None):
@@ -211,7 +214,8 @@ class ZipExtracter(object):
         if not folder:
             return None
 
-        fti_decider = queryMultiAdapter((folder, folder.REQUEST), IFactoryTypeDecider)
+        fti_decider = queryMultiAdapter((folder, folder.REQUEST),
+                                        IFactoryTypeDecider)
         path = folder.absolute_url_path()
         if node.is_folder:
             fti = fti_decider.get_folder_fti(path, node.name)
@@ -224,7 +228,6 @@ class ZipExtracter(object):
             obj = creator.create(node.name, blob_file, mimetype)
         node.id = obj.id
         return obj
-
 
     @staticmethod
     def copyfileobj(fsrc, fdst, max_size, buffer_length=16 * 1024):
@@ -241,7 +244,8 @@ class ZipExtracter(object):
     def create_parent_folders(self, extract_to, folder_node):
         parent_folder = folder_node.parent_folder
 
-        if parent_folder and not self.folder_exists(os.path.join(extract_to, parent_folder.path)):
+        if parent_folder and not self.folder_exists(os.path.join(extract_to,
+                                                    parent_folder.path)):
             self.create_parent_folders(extract_to, parent_folder)
         if not self.folder_exists(os.path.join(extract_to, folder_node.path)):
             self.create_object(extract_to, folder_node)

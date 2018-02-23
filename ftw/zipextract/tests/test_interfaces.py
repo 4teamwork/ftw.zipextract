@@ -1,16 +1,16 @@
-from zope.interface.verify import verifyClass
-import unittest
+from ftw.zipextract.factory_type_decider import DefaultFactoryTypeDecider
 from ftw.zipextract.file import ATFile
 from ftw.zipextract.file import DXFile
+from ftw.zipextract.implementations_at import ATFileCreator
+from ftw.zipextract.implementations_at import ATFolderCreator
+from ftw.zipextract.implementations_dx import DXFileCreator
+from ftw.zipextract.implementations_dx import DXFolderCreator
 from ftw.zipextract.interfaces import IFactoryTypeDecider
 from ftw.zipextract.interfaces import IFile
 from ftw.zipextract.interfaces import IFileCreator
 from ftw.zipextract.interfaces import IFolderCreator
-from ftw.zipextract.factory_type_decider import DefaultFactoryTypeDecider
-from ftw.zipextract.implementations_at import ATFolderCreator
-from ftw.zipextract.implementations_at import ATFileCreator
-from ftw.zipextract.implementations_dx import DXFolderCreator
-from ftw.zipextract.implementations_dx import DXFileCreator
+from zope.interface.verify import verifyClass
+import unittest
 
 
 class InterfacesTests(unittest.TestCase):

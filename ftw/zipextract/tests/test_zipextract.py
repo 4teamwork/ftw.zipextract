@@ -2,8 +2,8 @@ from ftw.builder import Builder
 from ftw.builder import create
 from ftw.testbrowser import browsing
 from ftw.zipextract.interfaces import IFile
-from ftw.zipextract.testing import FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
 from ftw.zipextract.testing import FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
+from ftw.zipextract.testing import FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
 from ftw.zipextract.tests import FunctionalTestCase
 from ftw.zipextract.zipextracter import ZipExtracter
 from operator import itemgetter
@@ -38,7 +38,8 @@ class ZipExtracterTestBase(FunctionalTestCase):
         self.file = create(
             Builder('file')
             .titled(u'false_size')
-            .attach_file_containing(self.asset('false_size.zip'), u'false_size.zip')
+            .attach_file_containing(self.asset('false_size.zip'),
+                                    u'false_size.zip')
             .within(self.folder))
 
     def add_name_conflict_zip_file(self):
@@ -48,11 +49,12 @@ class ZipExtracterTestBase(FunctionalTestCase):
         self.file = create(
             Builder('file')
             .titled(u'name_conflict')
-            .attach_file_containing(self.asset('name_conflict.zip'), u'name_conflict.zip')
+            .attach_file_containing(self.asset('name_conflict.zip'),
+                                    u'name_conflict.zip')
             .within(self.folder))
 
     def add_text_file(self):
-        """ This zip file contains 3 files and a directory
+        """ Add a text file
         """
         self.file = create(
             Builder('file')
@@ -69,19 +71,22 @@ class ZipExtracterTestBase(FunctionalTestCase):
 class TestZipExtracterArchetype(ZipExtracterTestBase):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
-    expected_titles = ['multizip', 'test.txt', 'test2.txt', 'test4.txt', 'test3.txt']
-    expected_paths = ['/plone/folder/multizip', '/plone/folder/multizip-1/test-txt',
-                      '/plone/folder/multizip-1/dir1/test2-txt', '/plone/folder/multizip-1/dir1/test3-txt',
+    expected_titles = ['multizip', 'test.txt', 'test2.txt',
+                       'test4.txt', 'test3.txt']
+    expected_paths = ['/plone/folder/multizip',
+                      '/plone/folder/multizip-1/test-txt',
+                      '/plone/folder/multizip-1/dir1/test2-txt',
+                      '/plone/folder/multizip-1/dir1/test3-txt',
                       '/plone/folder/multizip-1/dir1/dir2/test4-txt']
     expected_path_outside = "/plone/folder/test-txt"
     expected_path_single = '/plone/folder/dir1/test2-txt'
     expected_titles_conflicts = ['name_conflict', 'test.txt', 'test.txt',
                                  'test.txt', 'test.txt']
     expected_paths_conflicts = ['/plone/folder/name_conflict',
-                               '/plone/folder/name_conflict-1/test-txt',
-                               '/plone/folder/name_conflict-1/test/test-txt',
-                               '/plone/folder/name_conflict-1/test/test-txt-1',
-                               '/plone/folder/name_conflict-1/test/test/test-txt']
+                                '/plone/folder/name_conflict-1/test-txt',
+                                '/plone/folder/name_conflict-1/test/test-txt',
+                                '/plone/folder/name_conflict-1/test/test-txt-1',
+                                '/plone/folder/name_conflict-1/test/test/test-txt']
     traverse_error = AttributeError
 
     def setUp(self):
@@ -189,16 +194,18 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
 class TestZipExtracterDexterity(TestZipExtracterArchetype):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
-    expected_paths = ['/plone/folder/multi.zip', '/plone/folder/multi/test.txt',
-                      '/plone/folder/multi/dir1/test2.txt', '/plone/folder/multi/dir1/test3.txt',
+    expected_paths = ['/plone/folder/multi.zip',
+                      '/plone/folder/multi/test.txt',
+                      '/plone/folder/multi/dir1/test2.txt',
+                      '/plone/folder/multi/dir1/test3.txt',
                       '/plone/folder/multi/dir1/dir2/test4.txt']
     expected_path_single = '/plone/folder/dir1/test2.txt'
     expected_path_outside = "/plone/folder/test.txt"
     expected_paths_conflicts = ['/plone/folder/name_conflict.zip',
-                               '/plone/folder/name_conflict/test.txt',
-                               '/plone/folder/name_conflict/test/test.txt',
-                               '/plone/folder/name_conflict/test/test-1.txt',
-                               '/plone/folder/name_conflict/test/test/test.txt']
+                                '/plone/folder/name_conflict/test.txt',
+                                '/plone/folder/name_conflict/test/test.txt',
+                                '/plone/folder/name_conflict/test/test-1.txt',
+                                '/plone/folder/name_conflict/test/test/test.txt']
     traverse_error = KeyError
 
     def setUp(self):
