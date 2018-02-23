@@ -1,4 +1,5 @@
 from ftw.zipextract.interfaces import IFactoryTypeDecider
+from Products.CMFCore.utils import getToolByName
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -15,8 +16,10 @@ class DefaultFactoryTypeDecider(object):
         self.container = container
         self.request = request
 
-    def get_folder_portal_type(self, path, name):
-        return self.folder_type
+    def get_folder_fti(self, path, name):
+        fti = getToolByName(self.container, 'portal_types').get(self.folder_type)
+        return fti
 
-    def get_file_portal_type(self, path, name, mimetype):
-        return self.file_type
+    def get_file_fti(self, path, name, mimetype):
+        fti = getToolByName(self.container, 'portal_types').get(self.file_type)
+        return fti

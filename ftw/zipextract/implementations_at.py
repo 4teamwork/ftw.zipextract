@@ -9,14 +9,13 @@ try:
     from zope.app.container.interfaces import INameChooser
 except ImportError:
     from zope.container.interfaces import INameChooser
-from plone.namedfile.file import NamedBlobFile
-import mimetypes
+
 
 def normalize_id(name):
     normalizer = component.getUtility(IIDNormalizer)
     normalized = normalizer.normalize(name)
-    #normalized = normalized.replace('_', '-').replace(' ', '-').lower()
     return normalized
+
 
 @implementer(IFolderCreator)
 @adapter(Interface, Interface, Interface)
@@ -27,14 +26,12 @@ class ATFolderCreator(object):
         self.request = request
         self.fti = fti
 
-    def create(self, title):
-        normalized_id = normalize_id(title)
+    def create(self, name):
+        normalized_id = normalize_id(name)
         chooser = INameChooser(self.container)
         new_id = chooser.chooseName(normalized_id, self.container)
-        #return self.container.invokeFactory(self.fti.factory, new_id, title=title)
-        obj = self.container.invokeFactory("Folder", new_id, title=title)
-        obj = getattr(self.container, obj)
-        return obj
+        obj_id = self.container.invokeFactory(self.fti.id, new_id, title=name)
+        return getattr(self.container, obj_id)
 
 
 @implementer(IFileCreator)
@@ -46,19 +43,11 @@ class ATFileCreator(object):
         self.request = request
         self.fti = fti
 
-    def create(self, filename, temp_file):
+    def create(self, filename, temp_file, mimetype):
         normalized_id = normalize_id(filename)
         chooser = INameChooser(self.container)
         new_id = chooser.chooseName(normalized_id, self.container)
-        #obj = self.container.invokeFactory(self.fti.factory, new_id, title=filename)
-        obj = self.container.invokeFactory("File", new_id, title=filename)
-        mimetype = mimetypes.guess_type(filename)[0]
-        #blob_file = NamedBlobFile(data=open(temp_file.name),filename=unicode(filename),contentType=mimetype)
-        obj = getattr(self.container, obj)
-        #obj.getPrimaryField().set(obj, blob_file)
-        #field.set(obj, NamedBlobFile(blob_file))
+        obj_id = self.container.invokeFactory(self.fti.id, new_id, title=filename)
+        obj = getattr(self.container, obj_id)
         obj.getFile().getBlob().consumeFile(temp_file.name)
         return obj
-
-
-

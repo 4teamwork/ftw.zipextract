@@ -1,5 +1,5 @@
-from AccessControl import Unauthorized
 import os
+import mimetypes
 from plone import api
 from Products.CMFCore.interfaces import IFolderish
 from plone.i18n.normalizer.interfaces import IIDNormalizer
@@ -10,16 +10,16 @@ from ftw.zipextract.interfaces import IFileCreator
 from ftw.zipextract.interfaces import IFile
 from ftw.zipextract import logger
 import zipfile
-from ZODB.POSException import ConflictError
 from zope import component
 try:
     from zope.app.container.interfaces import INameChooser
 except ImportError:
     from zope.container.interfaces import INameChooser
 
-from Products.CMFCore.utils import getToolByName
 from zope.component import queryMultiAdapter
 from zope.component import getMultiAdapter
+from ftw.zipextract.interfaces import IFactoryTypeDecider
+
 
 def normalize_id(name):
     normalizer = component.getUtility(IIDNormalizer)
@@ -73,13 +73,14 @@ class FolderNode(object):
             file_list.extend(self.subtree[folder_node].get_files())
         return file_list
 
-def get_creator(interface, container, portal_type):
-    fti = getToolByName(container, 'portal_types').get(portal_type)
-    creator = queryMultiAdapter((container, container.REQUEST, fti), interface, name=portal_type)
+
+def get_creator(interface, container, fti):
+    creator = queryMultiAdapter((container, container.REQUEST, fti), interface, name=fti.id)
     if creator is not None:
         return creator
     else:
         return getMultiAdapter((container, container.REQUEST, fti), interface)
+
 
 class ZipExtracter(object):
     """
@@ -210,13 +211,18 @@ class ZipExtracter(object):
         if not folder:
             return None
 
+        fti_decider = queryMultiAdapter((folder, folder.REQUEST), IFactoryTypeDecider)
+        path = folder.absolute_url_path()
         if node.is_folder:
-            creator = get_creator(IFolderCreator, folder, folder.portal_type)
+            fti = fti_decider.get_folder_fti(path, node.name)
+            creator = get_creator(IFolderCreator, folder, fti)
             obj = creator.create(node.name)
         else:
-            creator = get_creator(IFileCreator, folder, 'File')
-            obj = creator.create(node.name, blob_file)
-        node.id=obj.id
+            mimetype = mimetypes.guess_type(node.name)[0]
+            fti = fti_decider.get_file_fti(path, node.name, mimetype)
+            creator = get_creator(IFileCreator, folder, fti)
+            obj = creator.create(node.name, blob_file, mimetype)
+        node.id = obj.id
         return obj
 
 
