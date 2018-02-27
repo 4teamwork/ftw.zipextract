@@ -16,7 +16,7 @@ msgstr ""
 
 #: ./ftw/zipextract/browser/templates/zipextract.pt:23
 msgid "Create root folder"
-msgstr "Wurzelordner ertstellen"
+msgstr "In neuem Ordner entpacken"
 
 #: ./ftw/zipextract/browser/templates/zipextract.pt:10
 msgid "Extract files from "
@@ -39,4 +39,3 @@ msgstr ""
 #: ./ftw/zipextract/configure.zcml:19
 msgid "ftw.zipextract default"
 msgstr ""
-
