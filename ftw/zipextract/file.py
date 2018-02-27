@@ -2,7 +2,7 @@ from ftw.zipextract.interfaces import IFile
 from zope.interface import implements
 
 
-class FileBase():
+class FileBase(object):
     """
     Abstract base class for implementing the IFIle interface.
     Should not be used on its own.
