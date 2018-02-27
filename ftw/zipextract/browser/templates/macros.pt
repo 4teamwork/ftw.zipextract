@@ -21,7 +21,7 @@
                             label child_folder/name;
                             chid python:fid+'_checkbox' "
                 tal:attributes="id fid" class="folder">
-                <input  type="checkbox" name="files:list" tal:attributes="value path; id chid"/>
+                <input  type="checkbox" name="dirs:list" tal:attributes="value path; id chid"/>
                 <label tal:attributes="for chid; value label" tal:content="label"/>
                 <ul>
                     <tal:recurse-block tal:define="folder_node child_folder">
