@@ -1,0 +1,25 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="ftw.zipextract">
+
+    <!-- resource directory -->
+    <browser:resourceDirectory
+        name="ftw.zipextract-resources"
+        directory="resources" />
+
+    <browser:page
+        for="*"
+        name="zipextract"
+        class=".zipextract_view.ZipExtractView"
+        permission="zope2.View"
+        />
+
+    <browser:page
+        for="*"
+        name="zipextract.macros"
+        template="templates/macros.pt"
+        permission="zope2.View"
+        />
+
+</configure>
