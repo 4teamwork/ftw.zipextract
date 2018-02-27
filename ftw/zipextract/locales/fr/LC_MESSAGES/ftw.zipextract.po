@@ -16,7 +16,7 @@ msgstr ""
 
 #: ./ftw/zipextract/browser/templates/zipextract.pt:23
 msgid "Create root folder"
-msgstr "Créer dossier racine"
+msgstr "Extraire dans un nouveau dossier"
 
 #: ./ftw/zipextract/browser/templates/zipextract.pt:10
 msgid "Extract files from "
