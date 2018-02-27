@@ -1,4 +1,5 @@
 from ftw.zipextract.zipextracter import ZipExtracter
+from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 import os
@@ -54,4 +55,7 @@ class ZipExtractView(BrowserView):
 
     def redirect_to_container(self):
         url = self.context.absolute_url()
+        site_properties = getToolByName(self.context, 'portal_properties').site_properties
+        if self.context.portal_type in site_properties.typesUseViewActionInListings:
+            url += '/view'
         return self.request.RESPONSE.redirect(url)
