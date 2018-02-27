@@ -4,7 +4,7 @@
 Introduction
 ============
 
-This package is used extract files and directories
+This package is used to extract files and directories
 from a zip file and add them to a Plone application.
 
 The module provides a view showing the contents of the
@@ -15,6 +15,7 @@ to extract.
 The extraction itself is designed to be as safe as possible, notably:
 
 * Safe against zip bombs
+
   * Checks announced size of files to extract (from zip file header) and stops extracting if that size is exceeded.
   * We can also set a total maximum data volume allowed to be extracted.
 
@@ -63,6 +64,8 @@ Installation
     eggs +=
         ...
         ftw.zipextract
+
+Install the generic setup profile of ``ftw.zipextract``.
 
 
 Development

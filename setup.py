@@ -36,7 +36,7 @@ setup(
     keywords='ftw zip extract',
     author='4teamwork AG',
     author_email='mailto:info@4teamwork.ch',
-    #url='https://github.com/4teamwork/ftw.zipextract',
+    url='https://github.com/4teamwork/ftw.zipextract',
     license='GPL2',
 
     packages=find_packages(exclude=['ez_setup']),
