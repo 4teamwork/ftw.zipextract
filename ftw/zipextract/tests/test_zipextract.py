@@ -150,9 +150,11 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
     def test_handle_extract_outside_destination(self):
         self.add_outside_zip_file()
         extracter = ZipExtracter(self.file)
+        files_before = len(self.portal.portal_catalog(portal_type='File'))
         extracter.extract(create_root_folder=False)
-        file = self.portal.portal_catalog(portal_type="File", Title="test")[0]
-        self.assertEquals(self.expected_path_outside, file.getPath())
+        files_after = len(self.portal.portal_catalog(portal_type='File'))
+        self.assertEquals(files_before, files_after,
+                          'files outside destionation should not be extracted at all.')
 
     def test_handle_false_file_size(self):
         self.add_false_size_zip_file()

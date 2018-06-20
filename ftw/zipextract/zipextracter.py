@@ -1,3 +1,4 @@
+from fnmatch import fnmatch
 from ftw.zipextract import logger
 from ftw.zipextract.interfaces import IFactoryTypeDecider
 from ftw.zipextract.interfaces import IFile
@@ -93,6 +94,11 @@ class ZipExtracter(object):
     but also create the file object in zope
     """
 
+    ignore_globs = ('.*',
+                    '**/.*',
+                    '__MACOSX',
+                    '__MACOSX/*')
+
     def __init__(self, context, max_size=None):
         ifile = IFile(context)
         if not ifile.is_zip():
@@ -130,6 +136,8 @@ class ZipExtracter(object):
         self.file_tree = FolderNode(None, "")
         # We first make all the directories
         for info in self.file_infos:
+            if self._is_ignored(info.filename):
+                continue
             is_folder = self.is_folder(info.filename)
             target_path = self.get_target_path(info)
             keys = target_path.split(os.path.sep)
@@ -147,6 +155,15 @@ class ZipExtracter(object):
                 file_id = self.generate_dict_key(filename, curr_node.file_dict)
                 curr_node.file_dict[file_id] = FileNode(
                     curr_node, filename, file_id, info)
+
+    def _is_ignored(self, path):
+        """Returns "True" when this path should not be offered for extraction.
+        """
+        filename = path.rstrip('/').split('/')[-1]
+        for pattern in self.ignore_globs:
+            if fnmatch(filename, pattern) or fnmatch(path, pattern):
+                return True
+        return False
 
     def is_folder(self, path):
         if path.endswith("/"):
