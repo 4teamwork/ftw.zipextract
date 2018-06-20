@@ -1,0 +1,7 @@
+body.template-zipextract .zipextract {
+  margin-left: 0;
+}
+
+body.template-zipextract .zipextract li {
+  list-style-type: none;
+}

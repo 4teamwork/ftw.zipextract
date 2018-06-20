@@ -50,6 +50,14 @@ class FileNode(object):
     def path(self):
         return os.path.join(self.parent_folder.path, self.id)
 
+    @property
+    def human_size(self):
+        size = self.info.file_size
+        if size > 1024:
+            return str(size / 1024) + "KB"
+        else:
+            return str(size) + "B"
+
 
 class FolderNode(object):
 

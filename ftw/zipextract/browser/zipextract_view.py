@@ -11,8 +11,6 @@ class ZipExtractView(BrowserView):
 
     def __call__(self):
         self.zipextracter = ZipExtracter(self.context)
-        for file_node in self.zipextracter.file_tree.get_files():
-            file_node.repr = self.file_repr(file_node)
         if self.request.get('form.submitted'):
             self.unzip(self.request)
             return self.redirect_to_container()
@@ -20,17 +18,6 @@ class ZipExtractView(BrowserView):
 
     def filename(self):
         return os.path.basename(self.context.absolute_url_path())
-
-    @staticmethod
-    def _file_size_repr(file_node):
-        size = file_node.info.file_size
-        if size > 1024:
-            return str(size / 1024) + "KB"
-        else:
-            return str(size) + "B"
-
-    def file_repr(self, file_node):
-        return file_node.name + ": " + self._file_size_repr(file_node)
 
     def unzip(self, request):
         if not (request.get('extract all') or request.get("extract selected")):
