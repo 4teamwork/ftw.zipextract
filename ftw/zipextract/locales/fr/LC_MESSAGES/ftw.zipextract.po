@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2018-01-15 09:42+0000\n"
+"POT-Creation-Date: 2018-06-21 07:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0\n"
 "Preferred-Encodings: utf-8 latin1\n"
 
-#: ./ftw/zipextract/browser/templates/zipextract.pt:23
+#: ./ftw/zipextract/browser/templates/zipextract.pt:26
 msgid "Create root folder"
 msgstr "Extraire dans un nouveau dossier"
 
@@ -23,12 +23,12 @@ msgid "Extract files from "
 msgstr "Extraire des fichiers de "
 
 #. Default: "Extract all"
-#: ./ftw/zipextract/browser/templates/zipextract.pt:29
+#: ./ftw/zipextract/browser/templates/zipextract.pt:32
 msgid "button_extract_all"
 msgstr "Extraire tout"
 
 #. Default: "Extract selected"
-#: ./ftw/zipextract/browser/templates/zipextract.pt:30
+#: ./ftw/zipextract/browser/templates/zipextract.pt:33
 msgid "button_extract_selected"
 msgstr "Extraire selection"
 
