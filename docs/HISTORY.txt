@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0.1 (unreleased)
+1.0.1 (2018-06-21)
 ------------------
 
 - Fix path issues in virtual host monster environment. [jone]
