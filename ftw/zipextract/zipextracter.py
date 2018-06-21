@@ -1,3 +1,5 @@
+from Acquisition import aq_inner
+from Acquisition import aq_parent
 from fnmatch import fnmatch
 from ftw.zipextract import logger
 from ftw.zipextract.interfaces import IFactoryTypeDecider
@@ -111,15 +113,15 @@ class ZipExtracter(object):
         ifile = IFile(context)
         if not ifile.is_zip():
             err_msg = "{} is not a zip file, can't extract from it.".format(
-                        context.absolute_url_path())
+                        '/'.join(context.getPhysicalPath()))
             raise TypeError(err_msg)
         file_blob = ifile.get_blob()
         self.context = context
         self.parent_node = context.getParentNode()
         self.zfile = zipfile.ZipFile(file_blob.open())
-        self.file_name = os.path.basename(self.context.absolute_url_path())
+        self.file_name = self.context.getId()
         self.file_name = os.path.splitext(self.file_name)[0]
-        self.parent_folder = os.path.dirname(self.context.absolute_url_path())
+        self.parent_folder = '/'.join(aq_parent(aq_inner(self.context)).getPhysicalPath())
         self.file_infos = self.extract_file_infos()
         self._extract_file_tree()
         self.max_size = max_size
@@ -227,7 +229,7 @@ class ZipExtracter(object):
         except KeyError:
             return False
         return (IFolderish.providedBy(folder)
-                and folder.absolute_url_path() == os.path.normpath(path)
+                and '/'.join(folder.getPhysicalPath()) == os.path.normpath(path)
                 and folder)
 
     def create_object(self, extract_to, node, blob_file=None):
@@ -241,7 +243,7 @@ class ZipExtracter(object):
 
         fti_decider = queryMultiAdapter((folder, folder.REQUEST),
                                         IFactoryTypeDecider)
-        path = folder.absolute_url_path()
+        path = '/'.join(folder.getPhysicalPath())
         if node.is_folder:
             fti = fti_decider.get_folder_fti(path, node.name)
             creator = get_creator(IFolderCreator, folder, fti)
