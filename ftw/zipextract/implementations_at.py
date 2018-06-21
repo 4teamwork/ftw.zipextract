@@ -33,7 +33,9 @@ class ATFolderCreator(object):
         chooser = INameChooser(self.container)
         new_id = chooser.chooseName(normalized_id, self.container)
         obj_id = self.container.invokeFactory(self.fti.id, new_id, title=name)
-        return getattr(self.container, obj_id)
+        obj = getattr(self.container, obj_id)
+        obj.processForm()
+        return obj
 
 
 @implementer(IFileCreator)
@@ -55,4 +57,5 @@ class ATFileCreator(object):
         file_wrapper.getBlob().consumeFile(temp_file.name)
         file_wrapper.setContentType(mimetype)
         file_wrapper.setFilename(filename)
+        obj.processForm()
         return obj
