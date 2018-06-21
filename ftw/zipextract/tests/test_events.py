@@ -16,9 +16,7 @@ import os
 class EventCatcher(object):
 
     def __init__(self):
-        self.added = []
-        self.created = []
-        self.modified = []
+        self.events = []
         self.setUp()
 
     def setUp(self):
@@ -32,30 +30,47 @@ class EventCatcher(object):
         getSiteManager().unregisterHandler(self.handleModified)
 
     def reset(self):
-        self.added = []
-        self.created = []
-        self.modified = []
+        self.events = []
 
     @adapter(IObjectAddedEvent)
     def handleAdded(self, event):
-        self.added.append(event)
+        self.events.append(event)
 
     @adapter(IObjectCreatedEvent)
     def handleCreated(self, event):
-        self.created.append(event)
+        self.events.append(event)
 
     @adapter(IObjectModifiedEvent)
     def handleModified(self, event):
-        self.modified.append(event)
+        self.events.append(event)
 
 
 class TestCreateObjectEventsAT(FunctionalTestCase):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
-    added_titles = [u'multizip', 'test.txt', u'dir1', 'test3.txt',
-                    'test2.txt', u'dir2', 'test4.txt']
-    modified_titles = [u'folder', u'multizip', u'multizip',
-                       u'dir1', u'dir1', u'dir1', u'dir2']
+    expected_events = [
+        ('ObjectCreatedEvent', u'multizip'),
+        ('ObjectAddedEvent', u'multizip'),
+        ('ContainerModifiedEvent', u'folder'),
+        ('ObjectCreatedEvent', 'test.txt'),
+        ('ObjectAddedEvent', 'test.txt'),
+        ('ContainerModifiedEvent', u'multizip'),
+        ('ObjectCreatedEvent', u'dir1'),
+        ('ObjectAddedEvent', u'dir1'),
+        ('ContainerModifiedEvent', u'multizip'),
+        ('ObjectCreatedEvent', 'test3.txt'),
+        ('ObjectAddedEvent', 'test3.txt'),
+        ('ContainerModifiedEvent', u'dir1'),
+        ('ObjectCreatedEvent', 'test2.txt'),
+        ('ObjectAddedEvent', 'test2.txt'),
+        ('ContainerModifiedEvent', u'dir1'),
+        ('ObjectCreatedEvent', u'dir2'),
+        ('ObjectAddedEvent', u'dir2'),
+        ('ContainerModifiedEvent', u'dir1'),
+        ('ObjectCreatedEvent', 'test4.txt'),
+        ('ObjectAddedEvent', 'test4.txt'),
+        ('ContainerModifiedEvent', u'dir2'),
+    ]
 
     def setUp(self):
         super(TestCreateObjectEventsAT, self).setUp()
@@ -85,23 +100,36 @@ class TestCreateObjectEventsAT(FunctionalTestCase):
         extracter = ZipExtracter(self.file)
         extracter.extract()
 
+        self.maxDiff = None
         self.assertEqual(
-            map(lambda x: x.object.title, self.eventCatcher.added),
-            self.added_titles)
-
-        self.assertEqual(
-            map(lambda x: x.object.title, self.eventCatcher.created),
-            self.added_titles)
-
-        self.assertEqual(
-            map(lambda x: x.object.title, self.eventCatcher.modified),
-            self.modified_titles)
+            self.expected_events,
+            [(type(event).__name__, event.object.title)
+              for event in self.eventCatcher.events])
 
 
 class TestCreateObjectEventsDX(TestCreateObjectEventsAT):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_DXTypes
-    added_titles = [u'multi', 'test.txt', u'dir1', 'test3.txt',
-                    'test2.txt', u'dir2', 'test4.txt']
-    modified_titles = [u'folder', u'multi', u'multi',
-                       u'dir1', u'dir1', u'dir1', u'dir2']
+    expected_events =  [
+        ('ObjectCreatedEvent', 'multi'),
+        ('ObjectAddedEvent', 'multi'),
+        ('ContainerModifiedEvent', u'folder'),
+        ('ObjectCreatedEvent', 'test.txt'),
+        ('ObjectAddedEvent', 'test.txt'),
+        ('ContainerModifiedEvent', 'multi'),
+        ('ObjectCreatedEvent', 'dir1'),
+        ('ObjectAddedEvent', 'dir1'),
+        ('ContainerModifiedEvent', 'multi'),
+        ('ObjectCreatedEvent', 'test3.txt'),
+        ('ObjectAddedEvent', 'test3.txt'),
+        ('ContainerModifiedEvent', 'dir1'),
+        ('ObjectCreatedEvent', 'test2.txt'),
+        ('ObjectAddedEvent', 'test2.txt'),
+        ('ContainerModifiedEvent', 'dir1'),
+        ('ObjectCreatedEvent', 'dir2'),
+        ('ObjectAddedEvent', 'dir2'),
+        ('ContainerModifiedEvent', 'dir1'),
+        ('ObjectCreatedEvent', 'test4.txt'),
+        ('ObjectAddedEvent', 'test4.txt'),
+        ('ContainerModifiedEvent', 'dir2'),
+    ]
