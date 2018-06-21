@@ -226,9 +226,9 @@ class ZipExtracter(object):
             return False
         except KeyError:
             return False
-        return (IFolderish.providedBy(folder) and
-                folder.absolute_url_path() == os.path.normpath(path) and
-                folder)
+        return (IFolderish.providedBy(folder)
+                and folder.absolute_url_path() == os.path.normpath(path)
+                and folder)
 
     def create_object(self, extract_to, node, blob_file=None):
         if node.parent_folder:
