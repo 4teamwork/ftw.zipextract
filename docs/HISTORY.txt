@@ -5,8 +5,7 @@ Changelog
 1.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix path issues in virtual host monster environment. [jone]
 
 1.0.0 (2018-06-21)
 ------------------
