@@ -51,5 +51,8 @@ class ATFileCreator(object):
         new_id = chooser.chooseName(normalized_id, self.container)
         obj_id = self.container.invokeFactory(self.fti.id, new_id, title=filename)
         obj = getattr(self.container, obj_id)
-        obj.getFile().getBlob().consumeFile(temp_file.name)
+        file_wrapper = obj.getFile()
+        file_wrapper.getBlob().consumeFile(temp_file.name)
+        file_wrapper.setContentType(mimetype)
+        file_wrapper.setFilename(filename)
         return obj
