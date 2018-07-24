@@ -1,14 +1,15 @@
 from Acquisition import aq_inner
 from Acquisition import aq_parent
+from Products.CMFCore.interfaces import IFolderish
 from fnmatch import fnmatch
 from ftw.zipextract import logger
 from ftw.zipextract.interfaces import IFactoryTypeDecider
 from ftw.zipextract.interfaces import IFile
 from ftw.zipextract.interfaces import IFileCreator
 from ftw.zipextract.interfaces import IFolderCreator
+from operator import attrgetter
 from plone import api
 from plone.i18n.normalizer.interfaces import IIDNormalizer
-from Products.CMFCore.interfaces import IFolderish
 from tempfile import NamedTemporaryFile
 from zope import component
 from zope.component import getMultiAdapter
@@ -79,11 +80,15 @@ class FolderNode(object):
         else:
             return self.id
 
-    def get_files(self):
+    def get_files(self, recursive=False):
         file_list = list(self.file_dict.values())
-        for folder_node in self.subtree:
-            file_list.extend(self.subtree[folder_node].get_files())
-        return file_list
+        if recursive:
+            for folder_node in self.subtree:
+                file_list.extend(self.subtree[folder_node].get_files(recursive=True))
+        return sorted(file_list, key=attrgetter('name'))
+
+    def get_folders(self):
+        return sorted(self.subtree.values(), key=attrgetter('name'))
 
 
 def get_creator(interface, container, fti):
@@ -307,7 +312,7 @@ class ZipExtracter(object):
             self.file_tree.name = self.file_name
             self.create_object(extract_to, self.file_tree)
         if file_list is None:
-            file_list = self.file_tree.get_files()
+            file_list = self.file_tree.get_files(recursive=True)
         tot_size = sum([file.info.file_size for file in file_list])
         if self.max_size and tot_size > self.max_size:
             return

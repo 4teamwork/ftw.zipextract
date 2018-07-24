@@ -3,7 +3,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 
     <metal:macro-block metal:define-macro="show_tree">
-        <tal:repeat-file tal:repeat="file_node folder_node/file_dict/values">
+        <tal:repeat-file tal:repeat="file_node folder_node/get_files">
             <li class="file"  tal:define="fid file_node/path_id;
                                           path file_node/path;
                                           chid python:fid+'_checkbox' "
@@ -13,7 +13,7 @@
                 <span class="discreet" tal:content="file_node/human_size" />
             </li>
         </tal:repeat-file>
-        <tal:repeat-folder tal:repeat="child_folder folder_node/subtree/values">
+        <tal:repeat-folder tal:repeat="child_folder folder_node/get_folders">
             <li tal:define="fid child_folder/path_id;
                             path child_folder/path;
                             label child_folder/name;
