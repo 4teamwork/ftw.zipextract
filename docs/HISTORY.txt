@@ -5,13 +5,13 @@ Changelog
 1.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Extract view: sort files and folders alphabetically. [jone]
 
 
 1.1.0 (2018-07-24)
 ------------------
 
-- Extract view: add a select all checkbox and remove extract all button.
+- Extract view: add a select all checkbox and remove extract all button. [jone]
 
 
 1.0.1 (2018-06-21)

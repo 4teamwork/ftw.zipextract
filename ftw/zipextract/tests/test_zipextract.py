@@ -106,8 +106,8 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.assertEqual(["test"], tree.file_dict.keys())
         self.assertEqual(["test3", "test2"], tree.subtree[
                          "dir1"].file_dict.keys())
-        self.assertEqual(["test.txt", "test3.txt", "test2.txt", "test4.txt"], [
-                         el.name for el in tree.get_files()])
+        self.assertEqual(["test.txt", "test2.txt", "test3.txt", "test4.txt"], [
+                         el.name for el in tree.get_files(recursive=True)])
         # Paths
         self.assertEqual(tree.subtree["dir1"].path, "dir1")
         self.assertEqual(tree.subtree["dir1"].file_dict[
@@ -181,8 +181,8 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         browser.visit(self.file, view="zipextract")
         file_tree = browser.css(".zipextract.file_tree li")
         id_list = map(lambda el: el.node.get("id"), file_tree)
-        expected_ids = ['test', 'dir1', 'dir1-test3',
-                        'dir1-test2', 'dir1-dir2', 'dir1-dir2-test4']
+        expected_ids = ['test', 'dir1', 'dir1-test2',
+                        'dir1-test3', 'dir1-dir2', 'dir1-dir2-test4']
         self.assertEquals(expected_ids, id_list)
 
     @browsing
