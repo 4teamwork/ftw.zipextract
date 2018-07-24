@@ -5,3 +5,7 @@ body.template-zipextract .zipextract {
 body.template-zipextract .zipextract li {
   list-style-type: none;
 }
+
+body.template-zipextract .zipextract label[for=select_all] {
+  font-weight: normal;
+}

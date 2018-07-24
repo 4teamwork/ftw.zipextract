@@ -11,8 +11,13 @@
         </h1>
     </metal:block>
     <metal:block fill-slot="main">
-        <form tal:attributes="action string:${here/absolute_url}/zipextract" method="POST">
+        <form tal:attributes="action string:${here/absolute_url}/zipextract" method="POST"
+	      class="zipextract">
 
+            <div>
+              <input type="checkbox" id="select_all" />
+	      <label for="select_all"><i i18n:translate="">select / deselect all</i></label>
+            </div>
             <ul class="zipextract file_tree"
                 tal:define="folder_node view/zipextracter/file_tree" >
                 <metal:block tal:define="folder_node view/zipextracter/file_tree"
@@ -29,7 +34,7 @@
             </div>
 
             <input type="hidden" name="form.submitted" value="true" />
-            <input type="submit" name="extract all" i18n:attributes="value button_extract_all" />
+            <!-- <input type="submit" name="extract all" i18n:attributes="value button_extract_all" /> -->
             <input type="submit" name="extract selected"
                    i18n:attributes="value button_extract_selected" />
         </form>

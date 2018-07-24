@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2018-06-21 07:08+0000\n"
+"POT-Creation-Date: 2018-07-24 18:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0\n"
 "Preferred-Encodings: utf-8 latin1\n"
 
-#: ./ftw/zipextract/browser/templates/zipextract.pt:26
+#: ./ftw/zipextract/browser/templates/zipextract.pt:31
 msgid "Create root folder"
 msgstr "Extraire dans un nouveau dossier"
 
@@ -22,21 +22,13 @@ msgstr "Extraire dans un nouveau dossier"
 msgid "Extract files from "
 msgstr "Extraire des fichiers de "
 
-#. Default: "Extract all"
-#: ./ftw/zipextract/browser/templates/zipextract.pt:32
-msgid "button_extract_all"
-msgstr "Extraire tout"
-
 #. Default: "Extract selected"
-#: ./ftw/zipextract/browser/templates/zipextract.pt:33
+#: ./ftw/zipextract/browser/templates/zipextract.pt:38
 msgid "button_extract_selected"
 msgstr "Extraire selection"
 
-#: ./ftw/zipextract/configure.zcml:27
-msgid "ftw.zipextract : uninstall"
+#: ./ftw/zipextract/browser/templates/zipextract.pt:19
+msgid "select / deselect all"
 msgstr ""
 
-#: ./ftw/zipextract/configure.zcml:19
-msgid "ftw.zipextract default"
-msgstr ""
 
