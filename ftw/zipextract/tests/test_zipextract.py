@@ -1,5 +1,6 @@
 from ftw.builder import Builder
 from ftw.builder import create
+from ftw.builder.dexterity import DexterityBuilder
 from ftw.testbrowser import browsing
 from ftw.zipextract.interfaces import IFile
 from ftw.zipextract.testing import FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
@@ -8,6 +9,7 @@ from ftw.zipextract.tests import FunctionalTestCase
 from ftw.zipextract.zipextracter import ZipExtracter
 from operator import itemgetter
 from operator import methodcaller
+from plone.dexterity.interfaces import IDexterityItem
 import os
 
 
@@ -21,6 +23,29 @@ class ZipExtracterTestBase(FunctionalTestCase):
             .titled(u'multizip')
             .attach_file_containing(self.asset('multi.zip'), u'multi.zip')
             .within(self.folder))
+
+    def add_zip_file_with_wrong_extension(self):
+        """ This is a normal zip file but with a wrong fileextension
+        """
+        self.file = create(
+            Builder('file')
+            .titled(u'multizip')
+            .attach_file_containing(self.asset('multi.zip'), u'multi.not_zip')
+            .within(self.folder))
+
+    def add_zip_with_non_standard_mimetype(self):
+        """ This is a normal zip file but with a non standard zip mimetype
+        """
+        self.file = create(
+            Builder('file')
+            .titled(u'multizip')
+            .attach_file_containing(self.asset('multi.zip'), u'multi.zip')
+            .within(self.folder))
+
+        if IDexterityItem.providedBy(self.file):
+            self.file.file.contentType = 'application/x-zip-compressed'
+        else:
+            self.file.getFile().setContentType('application/x-zip-compressed')
 
     def add_outside_zip_file(self):
         """ This zip contains a file "../test.txt"
@@ -155,6 +180,28 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         files_after = len(self.portal.portal_catalog(portal_type='File'))
         self.assertEquals(files_before, files_after,
                           'files outside destionation should not be extracted at all.')
+
+    def test_handle_wrong_filename(self):
+        self.add_zip_file_with_wrong_extension()
+        extracter = ZipExtracter(self.file)
+        to_extract = extracter.file_tree.subtree["dir1"].file_dict["test2"]
+        path = self.expected_path_single
+        with self.assertRaises(self.traverse_error):
+            self.portal.unrestrictedTraverse(path)
+        extracter.extract_file(to_extract)
+        file = self.portal.unrestrictedTraverse(path)
+        self.assertEqual(IFile(file).get_data(), 'Another test text file')
+
+    def test_handle_non_standard_mimetype(self):
+        self.add_zip_with_non_standard_mimetype()
+        extracter = ZipExtracter(self.file)
+        to_extract = extracter.file_tree.subtree["dir1"].file_dict["test2"]
+        path = self.expected_path_single
+        with self.assertRaises(self.traverse_error):
+            self.portal.unrestrictedTraverse(path)
+        extracter.extract_file(to_extract)
+        file = self.portal.unrestrictedTraverse(path)
+        self.assertEqual(IFile(file).get_data(), 'Another test text file')
 
     def test_handle_false_file_size(self):
         self.add_false_size_zip_file()
