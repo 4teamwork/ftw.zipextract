@@ -227,15 +227,11 @@ class ZipExtracter(object):
 
         portal = api.portal.get()
 
-        try:
-            folder = portal.unrestrictedTraverse(path)
-        except AttributeError:
-            return False
-        except KeyError:
-            return False
-        return (IFolderish.providedBy(folder)
-                and '/'.join(folder.getPhysicalPath()) == os.path.normpath(path)
-                and folder)
+        folder = portal.unrestrictedTraverse(path, default=False)
+        if (folder
+                and IFolderish.providedBy(folder)
+                and '/'.join(folder.getPhysicalPath()) == os.path.normpath(path)):
+            return folder
 
     def create_object(self, extract_to, node, blob_file=None):
         if node.parent_folder:

@@ -15,7 +15,7 @@ except ImportError:
 
 def normalize_id(name):
     normalizer = component.getUtility(IIDNormalizer)
-    normalized = normalizer.normalize(name)
+    normalized = normalizer.normalize(name).lstrip('_')
     return normalized
 
 
