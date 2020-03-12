@@ -97,12 +97,13 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
 
     layer = FTW_ZIPEXTRACT_FUNCTIONAL_TESTING_ATTypes
     expected_titles = ['multizip', 'test.txt', 'test2.txt',
-                       'test4.txt', 'test3.txt']
+                       'test4.txt', 'test3.txt', 'test5.txt']
     expected_paths = ['/plone/folder/multizip',
                       '/plone/folder/multizip-1/test-txt',
                       '/plone/folder/multizip-1/dir1/test2-txt',
                       '/plone/folder/multizip-1/dir1/test3-txt',
-                      '/plone/folder/multizip-1/dir1/dir2/test4-txt']
+                      '/plone/folder/multizip-1/dir1/dir2/test4-txt',
+                      '/plone/folder/multizip-1/dir3/test5-txt']
     expected_path_outside = "/plone/folder/test-txt"
     expected_path_single = '/plone/folder/dir1/test2-txt'
     expected_titles_conflicts = ['name_conflict', 'test.txt', 'test.txt',
@@ -124,14 +125,14 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         extracter = ZipExtracter(self.file)
         tree = extracter.file_tree
         # Directory tree
-        self.assertEqual(["dir1"], tree.subtree.keys())
+        self.assertEqual(["dir1", '_dir3'], tree.subtree.keys())
         self.assertEqual(["dir2"], tree.subtree["dir1"].subtree.keys())
         self.assertEqual([], tree.subtree["dir1"].subtree["dir2"].subtree.keys())
         # Files
         self.assertEqual(["test"], tree.file_dict.keys())
         self.assertEqual(["test3", "test2"], tree.subtree[
                          "dir1"].file_dict.keys())
-        self.assertEqual(["test.txt", "test2.txt", "test3.txt", "test4.txt"], [
+        self.assertEqual(["test.txt", "test2.txt", "test3.txt", "test4.txt", "test5.txt"], [
                          el.name for el in tree.get_files(recursive=True)])
         # Paths
         self.assertEqual(tree.subtree["dir1"].path, "dir1")
@@ -166,7 +167,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         extracter = ZipExtracter(self.file)
         extracter.extract()
         files = self.portal.portal_catalog(portal_type="File")
-        self.assertEquals(5, len(files))
+        self.assertEquals(6, len(files))
         titles = map(itemgetter("Title"), files)
         self.assertItemsEqual(self.expected_titles, titles)
         paths = map(methodcaller("getPath"), files)
@@ -228,7 +229,7 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         browser.visit(self.file, view="zipextract")
         file_tree = browser.css(".zipextract.file_tree li")
         id_list = map(lambda el: el.node.get("id"), file_tree)
-        expected_ids = ['test', 'dir1', 'dir1-test2',
+        expected_ids = ['test', '-dir3', '-dir3-test5', 'dir1', 'dir1-test2',
                         'dir1-test3', 'dir1-dir2', 'dir1-dir2-test4']
         self.assertEquals(expected_ids, id_list)
 
@@ -247,7 +248,8 @@ class TestZipExtracterDexterity(TestZipExtracterArchetype):
                       '/plone/folder/multi/test.txt',
                       '/plone/folder/multi/dir1/test2.txt',
                       '/plone/folder/multi/dir1/test3.txt',
-                      '/plone/folder/multi/dir1/dir2/test4.txt']
+                      '/plone/folder/multi/dir1/dir2/test4.txt',
+                      '/plone/folder/multi/dir3/test5.txt']
     expected_path_single = '/plone/folder/dir1/test2.txt'
     expected_path_outside = "/plone/folder/test.txt"
     expected_paths_conflicts = ['/plone/folder/name_conflict.zip',
