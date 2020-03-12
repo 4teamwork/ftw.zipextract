@@ -77,6 +77,14 @@ class TestCreateObjectEventsAT(FunctionalTestCase):
         ('ObjectAddedEvent', 'test4.txt'),
         ('ContainerModifiedEvent', u'dir2'),
         ('ObjectInitializedEvent', 'test4.txt'),
+        ('ObjectCreatedEvent', u'_dir3'),
+        ('ObjectAddedEvent', u'_dir3'),
+        ('ContainerModifiedEvent', u'multizip'),
+        ('ObjectInitializedEvent', u'_dir3'),
+        ('ObjectCreatedEvent', 'test5.txt'),
+        ('ObjectAddedEvent', 'test5.txt'),
+        ('ContainerModifiedEvent', u'_dir3'),
+        ('ObjectInitializedEvent', 'test5.txt'),
     ]
 
     def setUp(self):
@@ -139,4 +147,10 @@ class TestCreateObjectEventsDX(TestCreateObjectEventsAT):
         ('ObjectCreatedEvent', 'test4.txt'),
         ('ObjectAddedEvent', 'test4.txt'),
         ('ContainerModifiedEvent', 'dir2'),
+        ('ObjectCreatedEvent', '_dir3'),
+        ('ObjectAddedEvent', '_dir3'),
+        ('ContainerModifiedEvent', 'multi'),
+        ('ObjectCreatedEvent', 'test5.txt'),
+        ('ObjectAddedEvent', 'test5.txt'),
+        ('ContainerModifiedEvent', '_dir3'),
     ]
