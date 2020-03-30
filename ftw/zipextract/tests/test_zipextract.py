@@ -67,6 +67,16 @@ class ZipExtracterTestBase(FunctionalTestCase):
                                     u'false_size.zip')
             .within(self.folder))
 
+    def add_unicode_zip_file(self):
+        """ This zip contains a file with non ascii letters and one without.
+        """
+        self.file = create(
+            Builder('file')
+            .titled(u'unicode')
+            .attach_file_containing(self.asset('unicode.zip'),
+                                    u'unicode.zip')
+            .within(self.folder))
+
     def add_name_conflict_zip_file(self):
         """ This zip contains a file "test.txt" with a file size
         larger than announced in the header
@@ -239,6 +249,17 @@ class TestZipExtracterArchetype(ZipExtracterTestBase):
         self.add_text_file()
         with self.assertRaises(TypeError):
             browser.visit(self.file, view="zipextract")
+
+    @browsing
+    def test_extract_unicode_pathname(self, browser):
+        browser.exception_bubbling = True
+        self.add_unicode_zip_file()
+
+        browser.login().visit(self.file, view="zipextract")
+        checkboxes = browser.forms['form-1'].css('[type="checkbox"]')
+        for box in checkboxes:
+            box.attrib['checked'] = 'checked'
+        browser.forms['form-1'].submit()
 
 
 class TestZipExtracterDexterity(TestZipExtracterArchetype):

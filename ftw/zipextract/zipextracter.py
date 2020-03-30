@@ -39,6 +39,12 @@ def generate_uid(name, context):
     return chooser.chooseName(normalized_id, context)
 
 
+def safe_utf8(text):
+    if isinstance(text, unicode):
+        text = text.encode('utf8')
+    return text
+
+
 class FileNode(object):
 
     def __init__(self, parent_folder, filename, fileid, info):
@@ -191,7 +197,7 @@ class ZipExtracter(object):
         independent, and ensuring the path cannot point outside
         the current directory
         """
-        arcname = member.filename.replace('/', os.path.sep)
+        arcname = safe_utf8(member.filename.replace('/', os.path.sep))
         if os.path.altsep:
             arcname = arcname.replace(os.path.altsep, os.path.sep)
         arcname = os.path.splitdrive(arcname)[1]
