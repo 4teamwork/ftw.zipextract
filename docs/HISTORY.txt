@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.1.4 (unreleased)
+1.1.4 (2020-07-29)
 ------------------
 
 - Add support for unicode filenames in zipfile [mathias.leimgruber]
